@@ -5,7 +5,7 @@ import 'dart:math' as math;
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:media_kit/media_kit.dart';
+import 'package:media_kit/media_kit.dart' hide Playlist;
 import 'package:media_kit_video/media_kit_video.dart';
 
 import '../models/media_item.dart';
@@ -192,20 +192,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> importPlaylist() async {
-    final picked = await FilePicker.platform.pickFiles(
+    // file_picker 12+: static API, bytes are read lazily.
+    final file = await FilePicker.pickFile(
       type: FileType.custom,
       allowedExtensions: ['m3u', 'm3u8', 'txt'],
-      withData: true,
     );
-    if (picked == null || picked.files.isEmpty) return;
+    if (file == null) return;
 
-    final file = picked.files.first;
-    String content;
-    if (file.bytes != null) {
-      content = utf8.decode(file.bytes!, allowMalformed: true);
-    } else if (file.path != null) {
-      content = await FilePicker.platform.readFile(path: file.path!);
-    } else {
+    final String content;
+    try {
+      content = utf8.decode(await file.readAsBytes(), allowMalformed: true);
+    } catch (e) {
+      _snack('Could not read that file: $e');
       return;
     }
 
