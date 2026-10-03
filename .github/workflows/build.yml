@@ -19,7 +19,17 @@ jobs:
 
       - run: flutter create . --platforms=android
       - run: flutter pub get
+
+      # flutter create only adds INTERNET to debug builds. Without this line a
+      # release APK cannot open any network stream.
+      - name: Allow internet in release builds
+        run: |
+          F=android/app/src/main/AndroidManifest.xml
+          grep -q 'android.permission.INTERNET' $F || \
+            sed -i 's#<application#<uses-permission android:name="android.permission.INTERNET"/>\n    <application#' $F
+
       - run: flutter analyze
+      - run: flutter test
       - run: flutter build apk --release
 
       - uses: actions/upload-artifact@v4
