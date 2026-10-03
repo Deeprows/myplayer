@@ -129,7 +129,7 @@ class _MediaTileState extends State<MediaTile> {
           logo,
           fit: BoxFit.cover,
           cacheWidth: 120,
-          errorBuilder: (_, __, ___) => _placeholder(item),
+          errorBuilder: (_, _, _) => _placeholder(item),
         ),
       );
     }
@@ -195,7 +195,7 @@ class _EqBarsState extends State<_EqBars> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     return AnimatedBuilder(
       animation: _c,
-      builder: (_, __) {
+      builder: (_, _) {
         final t = _c.value * 2 * math.pi;
         final phases = [0.0, 1.3, 2.6];
         return SizedBox(
